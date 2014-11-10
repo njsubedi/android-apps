@@ -1,0 +1,34 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/bg"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:keepScreenOn="true"
+	tools:context="${relativePackage}.${activityClass}" >
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerInParent="true"
+		android:orientation="horizontal" >
+		<Button
+			android:id="@+id/btn_flash"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="toggleFlash"
+			android:text="Flash" />
+		<Button
+			android:id="@+id/btn_g"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="toggleScreen"
+			android:text="Screen" />
+	</LinearLayout>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		android:padding="10dp"
+		android:text="andronepal.com, 2014"
+		android:textColor="#CCC" />
+</RelativeLayout>
