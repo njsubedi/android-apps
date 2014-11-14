@@ -8,7 +8,9 @@ package np.com.njs.tinyflash;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Parameters;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -111,13 +113,38 @@ public class MainActivity extends Activity {
 				((Button) findViewById(R.id.btn_flash))
 						.setVisibility(View.VISIBLE);
 				if (!flashIsOn) {
+					/*
+					 * We need several device-specific hacks here to work on as
+					 * many devices as possible.
+					 */
+
 					param.setFlashMode(Parameters.FLASH_MODE_TORCH);
 					cam.setParameters(param);
+
+					// 1. Some devices don't support torch mode
+					if (param.getFlashMode() != Parameters.FLASH_MODE_TORCH) {
+						param.setFlashMode(Parameters.FLASH_MODE_ON);
+					}
+
+					// 2. Some devices need camera preview
+					cam.startPreview();
+
+					// 3. And some needed autofocus mode!
+					cam.autoFocus(new AutoFocusCallback() {
+						public void onAutoFocus(boolean success, Camera camera) {
+						}
+					});
+
+					/*
+					 * Finally we are here.
+					 */
+
 					((Button) findViewById(R.id.btn_flash)).setText("FLASH ON");
 					flashIsOn = true;
 				} else {
 					param.setFlashMode(Parameters.FLASH_MODE_OFF);
 					cam.setParameters(param);
+					cam.stopPreview();
 					((Button) findViewById(R.id.btn_flash))
 							.setText("FLASH OFF");
 					flashIsOn = false;
@@ -193,7 +220,9 @@ public class MainActivity extends Activity {
 		 * When flash light is turned off, we don't need to keep device from
 		 * sleeping.
 		 */
-		wakeLock.release();
+		if (wakeLock.isHeld()) {
+			wakeLock.release();
+		}
 
 		/*
 		 * After the flash is closed, release the camera's resource.
@@ -212,7 +241,9 @@ public class MainActivity extends Activity {
 		/*
 		 * When flash is turned on, we prevent the device from dimming/sleeping.
 		 */
-		wakeLock.acquire();
+		if (!wakeLock.isHeld()) {
+			wakeLock.acquire();
+		}
 		super.onResume();
 	}
 
